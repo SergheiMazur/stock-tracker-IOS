@@ -43,6 +43,8 @@ class LogInViewController: UIViewController {
                                 self.performSegue(withIdentifier: "goToUserStocksFromLogin", sender: self)
                             } else if response.result.description == "FAILURE" {
                                 self.showAlert(title: "Error", message: "Invalid Email or password.")
+                            } else {
+                                self.showAlert(title: "Error", message: "Please try again later")
                             }
         }
     }

@@ -19,7 +19,6 @@ class LogInViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         // Do any additional setup after loading the view.
     }
 
@@ -36,10 +35,21 @@ class LogInViewController: UIViewController {
                           encoding: JSONEncoding.default,
                           headers: headers).responseJSON {
                             response in
-                                if let json = response.result.value {
-                                    print("JSON: \(json)") // serialized json response
-                                }
                             if response.result.description == "SUCCESS" {
+                                let decoder = JSONDecoder()
+                                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                                guard let result = try? decoder.decode(DataUserCredentials.self, from: response.data!) else {
+                                    print("Error: Couldn't decode data")
+                                    return
+                                }
+                                
+                                print(result)
+                                
+                                // MARK: UserDefaults - only for testing !!!
+                                // TODO: Need to add Keychain access
+                                UserDefaults.standard.set(result.data.user.email, forKey: "email")
+                                UserDefaults.standard.set(result.data.user.authenticationToken, forKey: "token")
+                                
                                 self.performSegue(withIdentifier: "goToUserStocksFromLogin", sender: self)
                             } else if response.result.description == "FAILURE" {
                                 self.showAlert(title: "Error", message: "Invalid Email or password.")
@@ -48,6 +58,20 @@ class LogInViewController: UIViewController {
                             }
         }
     }
+    
+    struct Credentials: Decodable {
+        let authenticationToken : String
+        let email : String
+    }
+    
+    struct UserCredentials: Decodable {
+        let user :Credentials
+    }
+    
+    struct DataUserCredentials: Decodable {
+        let data :UserCredentials
+    }
+    
     
     func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)

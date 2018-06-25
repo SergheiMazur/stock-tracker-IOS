@@ -12,10 +12,11 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         //If there is a logged in user, by pass this screen and go straight to UserStocksController
-//        if !!false!! {
-//            performSegue(withIdentifier: "goToUserStocks", sender: self)
-//        }
+        if (UserDefaults.standard.string(forKey: "token") != nil) && (UserDefaults.standard.string(forKey: "email") != nil) {
+            performSegue(withIdentifier: "goToUserStocks", sender: self)
+        }
         
         
     }
@@ -24,7 +25,20 @@ class ViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Hide the navigation bar on the this view controller
+        self.navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        // Show the navigation bar on other view controllers
+        self.navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
 
 }
 
